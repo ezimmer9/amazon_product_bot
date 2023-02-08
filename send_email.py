@@ -9,12 +9,16 @@ mail_server_dict = {
 
 
 class email:
-    def __init__(self, receiver, text):
+    def __init__(self, receiver):
         self.__sender = 'eliranzim@gmail.com'
         self.receiver = receiver
-        self.msg = text
+        self.msg = None
         self.__psw = None
         self.server = None
+        self.loged_in = False
+
+    def set_text(self, text):
+        self.msg = text
 
     def login(self, mail_server, psw):
         self.__psw = psw
@@ -22,8 +26,8 @@ class email:
         self.server = smtplib.SMTP(server['server'], server["port"])
         self.server.ehlo()
         self.server.starttls()
-        l = self.server.login(self.__sender, self.__psw)
-        print()
+        self.server.login(self.__sender, self.__psw)
+        self.loged_in = True
 
     def send(self):
         self.server.sendmail(self.__sender, self.receiver, self.msg)
@@ -33,8 +37,8 @@ class email:
         self.__sender = sender
 
 
-reciver = 'eliransharon@gmail.com'
-psw = 'uvfeovzrzetgfhxb'
-e = email(reciver, 'this is test mail')
-e.login('gmail', psw)
-e.send()
+# reciver = 'eliransharon@gmail.com'
+# psw = 'uvfeovzrzetgfhxb'
+# e = email(reciver, 'this is test mail')
+# e.login('gmail', psw)
+# e.send()

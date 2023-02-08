@@ -1,10 +1,9 @@
-import os
-import sys
 from bs4 import BeautifulSoup
 import requests
 import json
 from PIL import Image
 from io import BytesIO
+from send_email import email
 
 class product:
     def __init__(self):
@@ -74,8 +73,33 @@ class product:
         first_link = list(img_str.keys())[num_element]
         return first_link
 
+    def check_price(self, prod, mail):
+        if prod.url != self.url:
+            return (None, "The url in to the same as the base product.")
+        if not mail.loged_in:
+            return (None, "You must login befor try to send mail.")
+        if prod.price < self.price:
+            text = "*************************************************\n" + \
+                   "                   Price Drop                    \n" + \
+                   f"The product: {self.title}\n" + \
+                   f"The basic price was: {self.price}\n" + \
+                   f"The price now is: {prod.price}\n" + \
+                   "*************************************************"
+            mail.set_text(text)
+            mail.send()
+            return (True, "")
+
 
 # url = 'https://www.amazon.com/Joseph-Stainless-Steel-Extendable-Non-Scratch-Drainage/dp/B07YLGKFR9?crid=36RURT0Y47TE2&keywords=B07YLGKFR9&qid=1657626877&smid=ATVPDKIKX0DER&sprefix=b07ylgkfr9%2Caps%2C189&sr=8-3&linkCode=sl1&tag=onoo-20&linkId=5c5f01f89eceba19a530324d1cdb708e&language=en_US&ref_=as_li_ss_tl&th=1'
 # # url = 'https://www.amazon.com/-/he/DEWALT-%D7%9E%D7%A9%D7%95%D7%9C%D7%91%D7%AA-%D7%90%D7%9C%D7%97%D7%95%D7%98%D7%99-%D7%A1%D7%95%D7%9C%D7%9C%D7%95%D7%AA-DCK44C2/dp/B082G2MKX8?ref_=Oct_DLandingS_D_bf6e40fe_68'
 # pr = product()
-# pr.get_product_page(url)
+# pr.title = "Test Product"
+# pr.price = 30
+# pr.url = "https://www.amazon.com/Joseph"
+# pr_1 = product()
+# pr_1.price = 28
+# pr_1.url = "https://www.amazon.com/Joseph"
+# mail = email('eliransharon@gmail.com')
+# psw = ''
+# mail.login('gmail', psw)
+# pr.check_price(pr_1, mail)

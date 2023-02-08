@@ -6,7 +6,7 @@ import requests
 from get_product import product
 from threading import Thread
 from queue import Queue
-from chart import drawChart,updateChart
+from chart import drawChart, updateChart
 NAME_SIZE = 23
 
 
