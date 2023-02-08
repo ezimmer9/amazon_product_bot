@@ -89,31 +89,34 @@ def make_window(theme=None):
     return window
 
 
-from multiprocessing import Process, Queue
+from threading import Thread
+from queue import Queue
 def interval_product_sampling(q, interval, days, url):
     prod = product()
-    hours = days * 24
+    hours = float(days) * 24
     min = hours * 60
     sec = min * 60
     total_start = time.time()
+    print("sec", sec)
     while True:
         total_end = time.time()
         total_time_ms = total_end - total_start
-        print("total_time_ms", total_time_ms)
-        if total_time_ms*1000 > sec:
+        print("total time: ", total_time_ms)
+        if total_time_ms > sec:
             break
-        time.sleep(interval*60*60)
+        time.sleep(float(interval)*60*60)
         prod.get_product_page(url)
+        print(prod.price)
         q.put(prod.price)
 
 
 window1, window2 = make_window(), None
 product_instance = product()
 queue = Queue()
-p = None
+t = None
 
 while True:
-    window, event, values = sg.read_all_windows()
+    window, event, values = sg.read_all_windows(timeout=1)
     # print(event, values)
     if (event == sg.WIN_CLOSED or event == 'Exit'):
         if window == window1:
@@ -130,16 +133,15 @@ while True:
         except Exception as e:
             exception_window(e)
             continue
-        p = Process(target=interval_product_sampling, args=(queue, window1['-INTERVAL-'].get(),
+        t = Thread(target=interval_product_sampling, args=(queue, window1['-INTERVAL-'].get(),
                                                             window1['-DURATION-'].get(), window1['-URL-'].get()))
-        p.start()
+        t.start()
         window2 = operation_window(window1['-URL-'].get())
-    if queue.empty() == False:
+    if queue.empty() is False:
         price = queue.get()
-        print(price)
+        print("from queue:", price)
     elif event == 'Version':
         sg.popup_scrolled(__file__, sg.get_versions(), keep_on_top=True, non_blocking=True)
-if p is not None:
-    p.join()
-    p.close()
+if t is not None:
+    t.join()
 window.close()
